@@ -3,22 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Idex</title>
-
-    <script>
-        // WebSocket initialization
-        const socket = new WebSocket('ws://localhost:9000/ws'); // Replace with your server's WebSocket address
-
-        socket.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            const progressBar = document.getElementById('uploadProgress');
-            progressBar.value = data.percentage;
-            if (data.percentage === 100) {
-                document.getElementById('progressContainer').style.display = 'none';
-            } else {
-                document.getElementById('progressContainer').style.display = 'block';
-            }
-        };
-    </script>
 </head>
 <body>
 

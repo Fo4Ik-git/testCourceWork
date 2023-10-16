@@ -1,6 +1,5 @@
 package com.example.courseworktest.core;
 
-import com.example.courseworktest.config.ProgressHandler;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
@@ -10,7 +9,6 @@ import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.progress.Progress;
 import net.bramp.ffmpeg.progress.ProgressListener;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -104,7 +102,6 @@ public class CompressVideo {
                     .done();
 
 
-            ProgressHandler progressHandler = new ProgressHandler();
             FFmpegJob job = executor.createJob(builder, new ProgressListener() {
                 final double duration_ns = in.getFormat().duration * TimeUnit.SECONDS.toNanos(1);
 
@@ -113,7 +110,7 @@ public class CompressVideo {
                     double percentage = progress.out_time_ns / duration_ns * 100;
 
                     // Send progress to frontend
-                    progressHandler.sendProgressUpdate(percentage);
+
                 }
             });
 
