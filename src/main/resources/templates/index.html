@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Idex</title>
+</head>
+<body>
+
+<form th:action="@{/addVideo}" method="post" enctype="multipart/form-data">
+    <input type="file" name="video" id="video">
+    <button type="submit" value="Upload" class="btn btn-primary">Add Video</button>
+</form>
+
+
+<video controls controlsList="nodownload" id="videoPlayer"
+th:src="${video}"></video>
+
+</body>
+</html>
