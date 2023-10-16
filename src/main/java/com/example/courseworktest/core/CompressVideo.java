@@ -8,12 +8,16 @@ import net.bramp.ffmpeg.job.FFmpegJob;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.progress.Progress;
 import net.bramp.ffmpeg.progress.ProgressListener;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
+
+@Component
 public class CompressVideo {
 
 
@@ -76,7 +80,7 @@ public class CompressVideo {
     }
    */
 
-    public static Path compressVideo(MultipartFile video) {
+    public Path compressVideo(MultipartFile video, WebSocketSession session) {
         try {
             FFmpeg ffmpeg = new FFmpeg("C:\\ProgramData\\chocolatey\\lib\\ffmpeg\\tools\\ffmpeg\\bin\\ffmpeg.exe");
             FFprobe ffprobe = new FFprobe("C:\\ProgramData\\chocolatey\\lib\\ffmpeg\\tools\\ffmpeg\\bin\\ffprobe.exe");
@@ -108,9 +112,8 @@ public class CompressVideo {
                 @Override
                 public void progress(Progress progress) {
                     double percentage = progress.out_time_ns / duration_ns * 100;
-
+                    System.out.println("Progress: " + percentage + "%");
                     // Send progress to frontend
-
                 }
             });
 
