@@ -40,3 +40,4 @@ out/
 Wallet_test
 **/src/main/resources/application.properties
 output.mp4
+videos/

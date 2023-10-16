@@ -1,5 +1,6 @@
-package com.example.courseworktest;
+package com.example.courseworktest.entity.service;
 
+import com.example.courseworktest.entity.Video;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
