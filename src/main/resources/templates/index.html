@@ -3,22 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <title>Idex</title>
+
+    <script>
+        const socket = new WebSocket('ws://26.8.137.161:9000/video-upload-progress');
+        socket.onopen = function (event) {
+            console.log('WebSocket is connected:' + event.type + ' ' + event.message);
+            console.log('WebSocket id:' + socket.id);
+        };
+
+        socket.onclose = function (event) {
+            console.log('WebSocket is closed:' + event.type + ' ' + event.message);
+        };
+
+        socket.onerror = function (event) {
+            console.log('WebSocket is error:' + event.type + ' ' + event.message);
+        };
+
+        socket.onmessage = function (event) {
+            const progress = parseInt(event.data);
+            document.getElementById('uploadProgress').value = progress;
+            document.getElementById("progress-text").innerText = progress;
+        };
+
+        function openProgressBar() {
+            document.getElementById('progressContainer').style.display = 'block';
+        }
+    </script>
 </head>
 <body>
 
-<form enctype="multipart/form-data" method="post" th:action="@{/addVideo}" onsubmit="simulateProgress();">
+<form enctype="multipart/form-data" method="post" th:action="@{/addVideo}" onsubmit="openProgressBar()">
     <input id="video" name="video" type="file">
     <button class="btn btn-primary" type="submit" value="Upload">Add Video</button>
 </form>
 
+<div style="width: max-content; border: solid 2px ">
+    <p th:text="${name} ?: 'No uploaded video'"></p>
+</div>
+
 <div id="progressContainer" style="display: none;">
-    <progress id="uploadProgress" value="0" max="100"></progress>
+    <span id="progress-text">0</span>% complete...</p>
+    <progress id="uploadProgress" max="100" value="0"></progress>
 </div>
 
 <div th:each="video : ${videos}">
     <video controls controlsList="nodownload" height="360" th:src="${video.getPathToVideo()}" width="640"></video>
 </div>
-
 
 </body>
 </html>
