@@ -5,26 +5,40 @@
     <title>Idex</title>
 
     <script>
-        const socket = new WebSocket('ws://26.8.137.161:9000/video-upload-progress');
-        socket.onopen = function (event) {
-            console.log('WebSocket is connected:' + event.type + ' ' + event.message);
-            console.log('WebSocket id:' + socket.id);
-        };
+        function initWebSocket(){
+            const socket = new WebSocket('ws://26.8.137.161:9000/video-upload-progress');
 
-        socket.onclose = function (event) {
-            console.log('WebSocket is closed:' + event.type + ' ' + event.message);
-        };
+            socket.onopen = function (event) {
+                console.log('WebSocket is connected:');
+            };
 
-        socket.onerror = function (event) {
-            console.log('WebSocket is error:' + event.type + ' ' + event.message);
-        };
+            socket.onclose = function (event) {
+                console.log('WebSocket is closed:');
+                console.log('WebSocket will reconnect after 5 seconds');
+                setTimeout(initWebSocket, 5000);
+            };
 
-        socket.onmessage = function (event) {
-            const progress = parseInt(event.data);
-            document.getElementById('uploadProgress').value = progress;
-            document.getElementById("progress-text").innerText = progress;
-        };
+            socket.onerror = function (event) {
+                console.log('WebSocket is error:');
+            };
 
+            socket.onmessage = function (event) {
+                if(event.data.startsWith("SESSION_ID:")) {
+                    const sessionId = event.data.split(":")[1];
+                    document.getElementById('webSocketSessionId').value = sessionId;
+                    console.log('WebSocketSession id: ' + sessionId);
+                }
+                if(event.data.startsWith("PROGRESS:")){
+                    // const progress = parseInt(event.data.split(":")[1]);
+                    const parts = event.data.split(":");
+                    const progress = parts.length > 1 ? parseInt(parts[1], 10) : 0;
+                    document.getElementById('uploadProgress').value = progress;
+                    document.getElementById("progress-text").innerText = progress;
+                }
+            };
+        }
+
+        initWebSocket();
         function openProgressBar() {
             document.getElementById('progressContainer').style.display = 'block';
         }
@@ -34,15 +48,18 @@
 
 <form enctype="multipart/form-data" method="post" th:action="@{/addVideo}" onsubmit="openProgressBar()">
     <input id="video" name="video" type="file">
+    <input type="hidden" id="webSocketSessionId" name="webSocketSessionId" value="">
+
     <button class="btn btn-primary" type="submit" value="Upload">Add Video</button>
 </form>
 
 <div style="width: max-content; border: solid 2px ">
     <p th:text="${name} ?: 'No uploaded video'"></p>
+    <p id="queue" style="display: none"><span id="queue-number">% </span> in Queue</p>
 </div>
 
 <div id="progressContainer" style="display: none;">
-    <span id="progress-text">0</span>% complete...</p>
+    <span id="progress-text">0</span>% complete</p>
     <progress id="uploadProgress" max="100" value="0"></progress>
 </div>
 

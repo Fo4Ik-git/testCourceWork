@@ -17,22 +17,21 @@ import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 
-public class CompressVideo {
+public class VideoCompress implements VideoCompressor {
 
     private final VideoUploadHandler videoUploadHandler;
 
-    public CompressVideo(VideoUploadHandler videoUploadHandler) {
+    public VideoCompress(VideoUploadHandler videoUploadHandler) {
         this.videoUploadHandler = videoUploadHandler;
     }
 
 
-    public Path compressVideo(MultipartFile video) {
+    private Path compressVideo(MultipartFile video, String uploadId, String outputVideoPath) {
         try {
             FFmpeg ffmpeg = new FFmpeg("C:\\ProgramData\\chocolatey\\lib\\ffmpeg\\tools\\ffmpeg\\bin\\ffmpeg.exe");
             FFprobe ffprobe = new FFprobe("C:\\ProgramData\\chocolatey\\lib\\ffmpeg\\tools\\ffmpeg\\bin\\ffprobe.exe");
 
             FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-            String outputVideoPath = "videos/" + video.getOriginalFilename();
             String inputVideoPath = video.getOriginalFilename();
 
             Files.write(Path.of(inputVideoPath), video.getBytes());
@@ -58,7 +57,7 @@ public class CompressVideo {
                 public void progress(Progress progress) {
                     int percentage = (int) (progress.out_time_ns / duration_ns * 100);
                     try {
-                        videoUploadHandler.sendProgress(percentage);
+                        videoUploadHandler.sendProgress(percentage, uploadId);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -73,5 +72,10 @@ public class CompressVideo {
             System.out.println("Error: " + e.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public Path compress(MultipartFile video, String userSessionId, String outputVideoPath) throws InterruptedException {
+        return compressVideo(video, userSessionId, outputVideoPath);
     }
 }
